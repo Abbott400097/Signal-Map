@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Building {
+  id        String   @id @default(cuid())
+  name      String
+  lat       Float
+  lng       Float
+  campus    String   @default("OTHER") // NORTH | SOUTH | OTHER
+  aliases   String   @default("[]") // JSON array of strings
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events Event[]
+}
+
+model Event {
+  id           String   @id @default(cuid())
+  sourceId     String?
+  title        String
+  description  String?
+  startTime    DateTime
+  endTime      DateTime?
+  buildingId   String?
+  locationText String?
+  organizer    String?
+  category     String?
+  isCLE        Boolean  @default(false)
+  status       String   @default("ACTIVE") // ACTIVE | CANCELLED
+  sourceRef    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  building Building? @relation(fields: [buildingId], references: [id], onDelete: SetNull)
+}
+
+model EventSource {
+  id            String    @id @default(cuid())
+  name          String
+  url           String
+  parserType    String // RSS | HTML | API
+  lastSuccessAt DateTime?
+  lastError     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  ingestLogs IngestLog[]
+}
+
+model IngestLog {
+  id           String   @id @default(cuid())
+  sourceId     String
+  runAt        DateTime @default(now())
+  newCount     Int      @default(0)
+  updatedCount Int      @default(0)
+  errorCount   Int      @default(0)
+  rawError     String?
+
+  source EventSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+}
