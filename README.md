@@ -43,29 +43,42 @@ https://youtu.be/GdXsXGQV098
 - Node.js 18+
 - npm
 
-### Setup
+### Quick Setup (one command)
 
 ```bash
-# Clone
 git clone https://github.com/Abbott400097/Signal-Map.git
 cd Signal-Map
+bash scripts/setup.sh
+npm run dev
+```
 
-# Install dependencies
+This installs deps, creates the database, seeds 86 buildings, and **pulls 580+ real events** from 5 live data sources. Then open **http://localhost:3000**.
+
+### Manual Setup (step by step)
+
+```bash
+git clone https://github.com/Abbott400097/Signal-Map.git
+cd Signal-Map
 npm install
-
-# Set up environment
 cp .env.example .env
 
-# Initialize database (SQLite — no external DB needed)
+# Initialize SQLite database (no external DB needed)
 npx prisma migrate dev
 
-# Seed buildings (86 UNC buildings with coordinates)
+# Seed 86 UNC buildings
 npx prisma db seed
+```
 
-# Ingest real events from all sources
+> **⚠️ Important — don't skip this step!**
+> The seed only creates buildings + 7 demo events. You **must** run ingest to pull real data:
+
+```bash
 npm run ingest
+```
 
-# Start dev server
+This fetches **580+ real events** from Heel Life, UNC Calendar, Libraries, and Athletics. Takes about 30 seconds.
+
+```bash
 npm run dev
 ```
 
